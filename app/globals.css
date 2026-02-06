@@ -1,0 +1,75 @@
+@import "tailwindcss";
+
+@font-face {
+  font-family: 'Gilroy';
+  src: url('/fonts/SVN-Gilroy_Medium.otf') format('otf');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+  --font-geist-sans: 'Gilroy', sans-serif;
+  --primary-color: #092F49;
+  --secondary-color: #0C4367;
+  --text-primary-color: #092F49;
+  --text-secondary-color: #606060;
+  --text-price-color: #EC1D27;
+  --success-color: #10b981;
+  --danger-color: #ef4444;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+
+  /* Mapping custom variables to Tailwind utility classes */
+  --color-primary: var(--primary-color);
+  --color-secondary: var(--secondary-color);
+  --color-text-primary: var(--text-primary-color);
+  --color-text-secondary: var(--text-secondary-color);
+  --color-text-price: var(--text-price-color);
+  --color-success: var(--success-color);
+  --color-danger: var(--danger-color);
+
+  --animate-ring: ring 0.5s infinite ease-in-out;
+}
+
+@keyframes ring {
+  0% {
+    transform: rotate(5deg);
+  }
+
+  25% {
+    transform: rotate(3deg);
+  }
+
+  50% {
+    transform: rotate(5deg);
+  }
+
+  75% {
+    transform: rotate(7deg);
+  }
+
+  100% {
+    transform: rotate(5deg);
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: 'Gilroy', sans-serif !important;
+}
