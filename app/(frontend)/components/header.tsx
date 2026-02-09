@@ -11,6 +11,14 @@ import { cn } from "@/lib/utils";
 export default function Header() {
     const [scrollY, setScrollY] = useState(0);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [openMenus, setOpenMenus] = useState<Record<string, boolean>>({});
+
+    const toggleMenu = (slug: string) => {
+        setOpenMenus(prev => ({
+            ...prev,
+            [slug]: !prev[slug]
+        }));
+    };
 
     useEffect(() => {
         const handleScroll = () => {
@@ -49,7 +57,7 @@ export default function Header() {
         {/* Mobile Drawer (Sidebar) */}
         <div 
             className={cn(
-                "fixed top-0 left-0 h-full w-[280px] bg-white z-[101] shadow-2xl transition-transform duration-300 ease-in-out lg:hidden flex flex-col",
+                "fixed top-0 left-0 h-full w-[360px] bg-white z-[101] shadow-2xl transition-transform duration-300 ease-in-out lg:hidden flex flex-col",
                 isMenuOpen ? "translate-x-0" : "-translate-x-full"
             )}
         >
@@ -78,39 +86,62 @@ export default function Header() {
             <div className="flex-1 overflow-y-auto bg-white">
                 <div className="p-4 space-y-6">
                     {NAVIGATION_DATA.map((menu: MainMenu) => (
-                        <div key={menu.slug} className="space-y-3">
+                        <div key={menu.slug} className="space-y-1">
                             {menu.dropdownData ? (
                                 <>
-                                    <div className="flex items-center gap-2 mb-2">
-                                        <div className="w-1 h-4 bg-[#092F49] rounded-full"></div>
-                                        <h3 className="font-bold text-[#092F49] text-sm uppercase tracking-wide">{menu.title}</h3>
-                                    </div>
-                                    <div className="space-y-4 pl-3">
-                                        {menu.dropdownData.map((category: NavCategory) => (
-                                            <div key={category.title} className="space-y-2">
-                                                <h4 className="font-semibold text-gray-800 text-[13px] border-b pb-1">{category.title}</h4>
-                                                <ul className="grid grid-cols-1 gap-1">
-                                                    {category.items.map((item: NavItem) => (
-                                                        <li key={item.slug}>
-                                                            <Link 
-                                                                href={`/category/${item.slug}`}
-                                                                onClick={() => setIsMenuOpen(false)}
-                                                                className="text-gray-500 hover:text-[#092F49] text-[13px] py-1 block transition-colors"
-                                                            >
-                                                                {item.label}
-                                                            </Link>
-                                                        </li>
-                                                    ))}
-                                                </ul>
-                                            </div>
-                                        ))}
+                                    <button 
+                                        onClick={() => toggleMenu(menu.slug)}
+                                        className="flex items-center justify-between w-full p-3 bg-gray-50/50 rounded-xl text-[#092F49] font-bold text-sm uppercase tracking-wide group"
+                                    >
+                                        <div className="flex items-center gap-2">
+                                            <div className="w-1 h-4 bg-[#092F49] rounded-full"></div>
+                                            {menu.title}
+                                        </div>
+                                        <svg 
+                                            className={cn(
+                                                "w-5 h-5 transition-transform duration-300 text-gray-400",
+                                                openMenus[menu.slug] && "rotate-180 text-[#092F49]"
+                                            )} 
+                                            fill="none" 
+                                            stroke="currentColor" 
+                                            viewBox="0 0 24 24"
+                                        >
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 9l-7 7-7-7" />
+                                        </svg>
+                                    </button>
+                                    
+                                    <div className={cn(
+                                        "overflow-hidden transition-all duration-300 ease-in-out pl-3",
+                                        openMenus[menu.slug] ? "max-h-[1000px] opacity-100 mt-2 pb-2" : "max-h-0 opacity-0"
+                                    )}>
+                                        <div className="space-y-4 pt-2 border-l-2 border-gray-100 ml-0.5 pl-4">
+                                            {menu.dropdownData.map((category: NavCategory) => (
+                                                <div key={category.title} className="space-y-2">
+                                                    <h4 className="font-bold text-gray-800 text-[13px] uppercase tracking-wider">{category.title}</h4>
+                                                    <ul className="grid grid-cols-1 gap-1">
+                                                        {category.items.map((item: NavItem) => (
+                                                            <li key={item.slug}>
+                                                                <Link 
+                                                                    href={`/category/${item.slug}`}
+                                                                    onClick={() => setIsMenuOpen(false)}
+                                                                    className="text-gray-500 hover:text-[#092F49] text-[13px] py-1.5 block transition-colors flex items-center gap-2"
+                                                                >
+                                                                    <span className="w-1 h-1 bg-gray-300 rounded-full group-hover:bg-[#092F49]"></span>
+                                                                    {item.label}
+                                                                </Link>
+                                                            </li>
+                                                        ))}
+                                                    </ul>
+                                                </div>
+                                            ))}
+                                        </div>
                                     </div>
                                 </>
                             ) : (
                                 <Link
                                     href={`/${menu.slug}`}
                                     onClick={() => setIsMenuOpen(false)}
-                                    className="flex items-center gap-2 p-3 bg-gray-50 rounded-xl text-[#092F49] font-semibold text-sm hover:bg-gray-100 transition-colors"
+                                    className="flex items-center gap-2 p-3 bg-gray-50/50 rounded-xl text-[#092F49] font-bold text-sm hover:bg-gray-100 transition-colors uppercase tracking-wide"
                                 >
                                     <span className="w-1.5 h-1.5 bg-[#092F49] rounded-full"></span>
                                     {menu.title}
@@ -301,7 +332,16 @@ export default function Header() {
                   <Dropdown key={menu.slug} title={menu.title}>
                     <div className="flex gap-12 w-full">
                       {/* Columns of Links */}
-                      <div className="grid grid-cols-6 gap-8 flex-1">
+                      <div className={cn(
+                        "grid gap-8 flex-1",
+                        menu.gridCols === 1 && "grid-cols-1",
+                        menu.gridCols === 2 && "grid-cols-2",
+                        menu.gridCols === 3 && "grid-cols-3",
+                        menu.gridCols === 4 && "grid-cols-4",
+                        menu.gridCols === 5 && "grid-cols-5",
+                        menu.gridCols === 6 && "grid-cols-6",
+                        !menu.gridCols && "grid-cols-6" // Mặc định là 6 nếu không có
+                      )}>
                         {menu.dropdownData.map((category: NavCategory) => (
                           <div key={category.title} className="space-y-4">
                             <h3 className="font-bold text-[#092F49] text-sm tracking-widest border-b pb-2 uppercase">{category.title}</h3>
