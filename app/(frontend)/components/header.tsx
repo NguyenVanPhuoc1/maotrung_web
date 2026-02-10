@@ -14,6 +14,14 @@ export default function Header() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
     const [categories, setCategories] = useState<MainMenu[]>(NAVIGATION_DATA);
+    const [openMenus, setOpenMenus] = useState<{ [key: string]: boolean }>({});
+
+    const toggleMenu = (slug: string) => {
+        setOpenMenus(prev => ({
+            ...prev,
+            [slug]: !prev[slug]
+        }));
+    };
 
     useEffect(() => {
         const fetchCategories = async () => {

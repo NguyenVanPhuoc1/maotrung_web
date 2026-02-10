@@ -33,7 +33,7 @@ apiClient.interceptors.request.use(
 
         return config;
     },
-    (error) => {
+    (error: any) => {
         return Promise.reject(error);
     }
 );
