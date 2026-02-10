@@ -7,10 +7,75 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import { NAVIGATION_DATA, NavCategory, NavItem, MainMenu } from "@/constants/navigation";
 import { cn } from "@/lib/utils";
+import { http } from "@/lib/api-client";
 
 export default function Header() {
     const [scrollY, setScrollY] = useState(0);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [categories, setCategories] = useState<MainMenu[]>(NAVIGATION_DATA);
+
+    useEffect(() => {
+        const fetchCategories = async () => {
+            try {
+                // Lấy root categories (parent/0)
+                const response: any = await http.get('site/productcategories/parent/0');
+                const rootItems = response.items || [];
+
+                // Chạy đồng thời các API lấy danh mục con cho từng root
+                const childrenResults = await Promise.all(
+                    rootItems.map((item: any) =>
+                        http.get<any>(`site/productcategories/parent/${item.id}`)
+                            .then(res => ({
+                                parentId: item.id,
+                                children: res.items || []
+                            }))
+                            .catch(() => ({
+                                parentId: item.id,
+                                children: []
+                            }))
+                    )
+                );
+
+                // Map dữ liệu vào cấu trúc MainMenu
+                const mappedCategories: MainMenu[] = rootItems.map((item: any) => {
+                    const mockup = NAVIGATION_DATA.find(nav => nav.slug === item.seo_url);
+                    const apiChildren = childrenResults.find(res => res.parentId === item.id)?.children || [];
+
+                    // Tạo NavCategory từ API children
+                    const apiNavCategory: NavCategory | null = apiChildren.length > 0 ? {
+                        title: "Dòng sản phẩm",
+                        items: apiChildren.map((child: any) => ({
+                            label: child.name,
+                            slug: child.seo_url
+                        }))
+                    } : null;
+
+                    const finalDropdownData: NavCategory[] = [];
+                    if (apiNavCategory) {
+                        finalDropdownData.push(apiNavCategory);
+                    }
+
+                    // Mockup data
+                    // if (mockup?.dropdownData) {
+                    //     finalDropdownData.push(...mockup.dropdownData);
+                    // }
+
+                    return {
+                        title: item.name.toUpperCase(),
+                        slug: item.seo_url,
+                        dropdownData: finalDropdownData.length > 0 ? finalDropdownData : undefined
+                    };
+                });
+
+                setCategories(mappedCategories);
+            } catch (error) {
+                console.error("Failed to fetch categories:", error);
+                setCategories(NAVIGATION_DATA);
+            }
+        };
+
+        fetchCategories();
+    }, []);
 
     useEffect(() => {
         const handleScroll = () => {
@@ -77,7 +142,7 @@ export default function Header() {
             {/* Drawer Content */}
             <div className="flex-1 overflow-y-auto bg-white">
                 <div className="p-4 space-y-6">
-                    {NAVIGATION_DATA.map((menu: MainMenu) => (
+                    {categories.map((menu: MainMenu) => (
                         <div key={menu.slug} className="space-y-3">
                             {menu.dropdownData ? (
                                 <>
@@ -296,7 +361,7 @@ export default function Header() {
         <div data-label="container" className="mx-auto max-w-full md:px-4 xl:px-12 2xl:px-16 px-4 sm:px-6 lg:px-8 w-full hidden lg:block">
           <div className="flex justify-between items-center">
             <div className="flex items-center h-16 space-x-4">
-              {NAVIGATION_DATA.map((menu: MainMenu) => (
+              {categories.map((menu: MainMenu) => (
                 menu.dropdownData ? (
                   <Dropdown key={menu.slug} title={menu.title}>
                     <div className="flex gap-12 w-full">
