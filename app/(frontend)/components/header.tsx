@@ -7,7 +7,7 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import { NAVIGATION_DATA, NavCategory, NavItem, MainMenu } from "@/constants/navigation";
 import { cn } from "@/lib/utils";
-import { http } from "@/lib/api-client";
+import { getHeaderCategories } from "@/services/category";
 
 export default function Header() {
     const [scrollY, setScrollY] = useState(0);
@@ -25,62 +25,8 @@ export default function Header() {
 
     useEffect(() => {
         const fetchCategories = async () => {
-            try {
-                // Lấy root categories (parent/0)
-                const response: any = await http.get('site/productcategories/parent/0');
-                const rootItems = response.items || [];
-
-                // Chạy đồng thời các API lấy danh mục con cho từng root
-                const childrenResults = await Promise.all(
-                    rootItems.map((item: any) =>
-                        http.get<any>(`site/productcategories/parent/${item.id}`)
-                            .then(res => ({
-                                parentId: item.id,
-                                children: res.items || []
-                            }))
-                            .catch(() => ({
-                                parentId: item.id,
-                                children: []
-                            }))
-                    )
-                );
-
-                // Map dữ liệu vào cấu trúc MainMenu
-                const mappedCategories: MainMenu[] = rootItems.map((item: any) => {
-                    const mockup = NAVIGATION_DATA.find(nav => nav.slug === item.seo_url);
-                    const apiChildren = childrenResults.find(res => res.parentId === item.id)?.children || [];
-
-                    // Tạo NavCategory từ API children
-                    const apiNavCategory: NavCategory | null = apiChildren.length > 0 ? {
-                        title: "Dòng sản phẩm",
-                        items: apiChildren.map((child: any) => ({
-                            label: child.name,
-                            slug: child.seo_url
-                        }))
-                    } : null;
-
-                    const finalDropdownData: NavCategory[] = [];
-                    if (apiNavCategory) {
-                        finalDropdownData.push(apiNavCategory);
-                    }
-
-                    // Mockup data
-                    // if (mockup?.dropdownData) {
-                    //     finalDropdownData.push(...mockup.dropdownData);
-                    // }
-
-                    return {
-                        title: item.name.toUpperCase(),
-                        slug: item.seo_url,
-                        dropdownData: finalDropdownData.length > 0 ? finalDropdownData : undefined
-                    };
-                });
-
-                setCategories(mappedCategories);
-            } catch (error) {
-                console.error("Failed to fetch categories:", error);
-                setCategories(NAVIGATION_DATA);
-            }
+            const data = await getHeaderCategories();
+            setCategories(data);
         };
 
         fetchCategories();
@@ -261,12 +207,14 @@ export default function Header() {
           <div data-label="container" className="mx-auto max-w-full md:px-4 xl:px-12 2xl:px-16 px-4 sm:px-6 lg:px-8 w-full">
             <div className="flex justify-between items-center h-16">
               <div className="flex items-center">
-                <Image
-                  src="/assets/images/logo/logo.png"
-                  alt="Logo"
-                  width={145}
-                  height={55}
-                />
+                <Link href="/">
+                  <Image
+                    src="/assets/images/logo/logo.png"
+                    alt="Logo"
+                    width={145}
+                    height={55}
+                  />
+                </Link>
               </div>
               <div className="flex-search flex flex-col items-center lg:min-w-130 relative">
                 <Image
@@ -298,6 +246,7 @@ export default function Header() {
                     alt="Cart"
                     width={16}
                     height={16}
+                    style={{ width: "auto", height: "auto" }}
                   />
                   <span>GIỎ HÀNG</span>
                 </Link>
@@ -311,6 +260,7 @@ export default function Header() {
                     alt="Wishlist"
                     width={16}
                     height={16}
+                    style={{ width: "auto", height: "auto" }}
                   />
                   <span>YÊU THÍCH</span>
                 </Link>
@@ -324,6 +274,7 @@ export default function Header() {
                     alt="Profile"
                     width={16}
                     height={16}
+                    style={{ width: "auto", height: "auto" }}
                   />
                   <span>HỒ SƠ</span>
                 </Link>
@@ -362,6 +313,7 @@ export default function Header() {
                   alt="Cart"
                   width={24}
                   height={24}
+                  style={{ width: "auto", height: "auto" }}
                 />
               </Link>
             </div>
@@ -436,6 +388,8 @@ export default function Header() {
                             alt="Category Preview" 
                             fill 
                             className="object-cover transition-transform duration-500 group-hover:scale-105" 
+                            sizes="(max-width: 1280px) 0px, 240px"
+                            priority
                           />
                           <div className="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors duration-300" />
                         </div>
@@ -445,6 +399,7 @@ export default function Header() {
                             alt="Product Preview" 
                             fill 
                             className="object-cover transition-transform duration-500 group-hover:scale-105" 
+                            sizes="(max-width: 1280px) 0px, 240px"
                           />
                           <div className="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors duration-300" />
                         </div>
