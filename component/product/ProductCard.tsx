@@ -59,7 +59,11 @@ export default function ProductCard({
                 {specs.slice(0, 4).map((spec, idx) => (
                     <div key={idx} className="flex items-start gap-2">
                         <span className="text-gray-400 mt-1 shrink-0">
-                            {spec.icon && React.cloneElement(spec.icon as React.ReactElement, { size: 14 })}
+                            {/* Ép kiểu sang ReactElement có thuộc tính size để tránh lỗi TypeScript */}
+                            {React.isValidElement(spec.icon) && React.cloneElement(spec.icon as React.ReactElement<{ size?: number; strokeWidth?: number }>, { 
+                                size: 14,
+                                strokeWidth: 2 
+                            })}
                         </span>
             
                         <div className="flex flex-col">
