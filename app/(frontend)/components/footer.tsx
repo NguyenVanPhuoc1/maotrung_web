@@ -16,6 +16,7 @@ export default function Footer() {
                                 width={180}
                                 height={68}
                                 className="object-contain"
+                                style={{ width: "auto", height: "auto" }}
                             />
                         </Link>
                         
@@ -74,7 +75,7 @@ export default function Footer() {
                                 {SOCIAL_LINKS.map((social) => (
                                     <Link key={social.platform} href={social.href} className="hover:opacity-80 transition-opacity">
                                         {/* Fallback to simple circle if icons don't exist, but using Image as requested */}
-                                        <Image src={social.icon} alt={social.platform} width={32} height={32} className="object-contain" />
+                                        <Image src={social.icon} alt={social.platform} width={32} height={32} className="object-contain" style={{ width: "auto", height: "auto" }} />
                                     </Link>
                                 ))}
                             </div>
@@ -84,7 +85,7 @@ export default function Footer() {
                             <h3 className="font-bold text-sm tracking-widest uppercase">Chứng nhận</h3>
                             <div className="relative w-full h-[65px]">
                                 {/* Placeholder for Bo Cong Thuong certificate */}
-                                <Image src="/assets/images/bocongthuong.png" alt="Bo Cong Thuong" width={150} height={56} className="object-contain" />
+                                <Image src="/assets/images/bocongthuong.png" alt="Bo Cong Thuong" width={150} height={56} className="object-contain" style={{ width: "auto", height: "auto" }} />
                             </div>
                         </div>
                     </div>
