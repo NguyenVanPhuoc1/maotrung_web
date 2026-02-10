@@ -5,7 +5,7 @@ import { Input } from "@/component/ui/input";
 import { Dropdown } from "@/component/ui/dropdown";
 import Link from "next/link";
 import { useState, useEffect } from "react";
-import { NAVIGATION_DATA, NavCategory, NavItem, MainMenu } from "@/constants/navigation";
+import { NavCategory, NavItem, MainMenu } from "@/constants/navigation";
 import { cn } from "@/lib/utils";
 import { getHeaderCategories } from "@/services/category";
 
@@ -13,8 +13,9 @@ export default function Header() {
     const [scrollY, setScrollY] = useState(0);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-    const [categories, setCategories] = useState<MainMenu[]>(NAVIGATION_DATA);
+    const [categories, setCategories] = useState<MainMenu[]>([]);
     const [openMenus, setOpenMenus] = useState<{ [key: string]: boolean }>({});
+    const [isLoading, setIsLoading] = useState(true);
 
     const toggleMenu = (slug: string) => {
         setOpenMenus(prev => ({
@@ -25,8 +26,15 @@ export default function Header() {
 
     useEffect(() => {
         const fetchCategories = async () => {
-            const data = await getHeaderCategories();
-            setCategories(data);
+            try {
+                const data = await getHeaderCategories();
+                setCategories(data);
+            } catch (error) {
+                console.error("Failed to fetch categories:", error);
+                setCategories([]); // ← Không có data mặc định
+            } finally {
+                setIsLoading(false);
+            }
         };
 
         fetchCategories();
