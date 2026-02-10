@@ -4,11 +4,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import { cn } from "@/lib/utils";
 
-interface DropdownProps {
-    className?: string;
-    title: string;
-    children: React.ReactNode;
-}
+import { DropdownProps } from '@/types/ui';
 
 const Dropdown = React.forwardRef<HTMLDivElement, DropdownProps>(
     ({ className, title, children, ...props }, ref) => {
@@ -79,6 +75,7 @@ const Dropdown = React.forwardRef<HTMLDivElement, DropdownProps>(
                 className="fixed inset-0 bg-black/20 backdrop-blur-[8px] z-[40] animate-in fade-in duration-500"
                 style={{ WebkitBackdropFilter: "blur(8px)" }}
                 onClick={() => setIsOpen(false)}
+                onMouseEnter={() => setIsOpen(false)}
               />,
               document.body
             )}

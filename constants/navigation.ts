@@ -12,12 +12,14 @@ export interface MainMenu {
     title: string;
     slug: string;
     dropdownData?: NavCategory[];
+    gridCols?: number;
 }
 
 export const NAVIGATION_DATA: MainMenu[] = [
     {
         title: "GẠCH, ĐÁ & SÀN GỖ",
         slug: "gach-da-san-go",
+        gridCols: 6,
         dropdownData: [
             {
                 title: "LOẠI GẠCH",
@@ -82,6 +84,7 @@ export const NAVIGATION_DATA: MainMenu[] = [
     {
         title: "THIẾT BỊ VỆ SINH",
         slug: "thiet-bi-ve-sinh",
+        gridCols: 6,
         dropdownData: [
             {
                 title: "BỒN CẦU",
@@ -142,6 +145,7 @@ export const NAVIGATION_DATA: MainMenu[] = [
     {
         title: "THIẾT BỊ BẾP",
         slug: "thiet-bi-bep",
+        gridCols: 4,
         dropdownData: [
             {
                 title: "BẾP",
@@ -181,6 +185,7 @@ export const NAVIGATION_DATA: MainMenu[] = [
     {
         title: "GIA DỤNG",
         slug: "gia-dung",
+        gridCols: 4,
         dropdownData: [
             {
                 title: "NẤU ĂN",
