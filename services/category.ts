@@ -1,5 +1,5 @@
 import { http } from "@/lib/api-client";
-import { MainMenu, NavCategory, NAVIGATION_DATA } from "@/constants/navigation";
+import { MainMenu, NavCategory } from "@/constants/navigation";
 
 const CACHE_KEY = 'app_categories_cache';
 const CACHE_TIME = 60 * 60 * 1000; // 1 giờ
@@ -96,6 +96,6 @@ export async function getHeaderCategories(): Promise<MainMenu[]> {
         return mappedCategories;
     } catch (error) {
         console.error("Failed to fetch categories:", error);
-        return NAVIGATION_DATA;
+        return []; 
     }
 }
